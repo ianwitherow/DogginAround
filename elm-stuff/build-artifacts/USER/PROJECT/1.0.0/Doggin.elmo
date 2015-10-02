@@ -1,0 +1,129 @@
+Elm.Doggin = Elm.Doggin || {};
+Elm.Doggin.make = function (_elm) {
+   "use strict";
+   _elm.Doggin = _elm.Doggin || {};
+   if (_elm.Doggin.values)
+   return _elm.Doggin.values;
+   var _op = {},
+   _N = Elm.Native,
+   _U = _N.Utils.make(_elm),
+   _L = _N.List.make(_elm),
+   $moduleName = "Doggin",
+   $Basics = Elm.Basics.make(_elm),
+   $Dogs = Elm.Dogs.make(_elm),
+   $Html = Elm.Html.make(_elm),
+   $Html$Attributes = Elm.Html.Attributes.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm),
+   $Treats = Elm.Treats.make(_elm);
+   var viewDog = function (dog) {
+      return A2($Html.div,
+      _L.fromArray([$Html$Attributes.$class("dog")]),
+      _L.fromArray([A2($Html.img,
+                   _L.fromArray([$Html$Attributes.src(dog.imageUrl)]),
+                   _L.fromArray([]))
+                   ,A2($Html.span,
+                   _L.fromArray([$Html$Attributes.$class("dog-name")]),
+                   _L.fromArray([$Html.text(dog.name)]))]));
+   };
+   var viewTreat = F2(function (selectedTreat,
+   treat) {
+      return function () {
+         var className = function () {
+            switch (selectedTreat.ctor)
+            {case "Just":
+               return _U.eq(treat,
+                 selectedTreat._0) ? "treat treat-selected" : "treat";
+               case "Nothing": return "treat";}
+            _U.badCase($moduleName,
+            "between lines 55 and 64");
+         }();
+         return A2($Html.div,
+         _L.fromArray([$Html$Attributes.$class(className)]),
+         _L.fromArray([A2($Html.img,
+                      _L.fromArray([$Html$Attributes.src(treat.imageUrl)]),
+                      _L.fromArray([]))
+                      ,A2($Html.span,
+                      _L.fromArray([$Html$Attributes.$class("treat-name")]),
+                      _L.fromArray([$Html.text(treat.name)]))]));
+      }();
+   });
+   var view = F2(function (actions,
+   model) {
+      return A2($Html.div,
+      _L.fromArray([$Html$Attributes.id("page")]),
+      _L.fromArray([A2($Html.h1,
+                   _L.fromArray([]),
+                   _L.fromArray([$Html.text("Doggin\' Around")]))
+                   ,A2($Html.p,
+                   _L.fromArray([]),
+                   _L.fromArray([$Html.text("Select a treat, then choose a dog to give it to!")]))
+                   ,A2($Html.div,
+                   _L.fromArray([$Html$Attributes.id("treats")]),
+                   A2($List.map,
+                   viewTreat(model.selectedTreat),
+                   model.allTreats))
+                   ,A2($Html.div,
+                   _L.fromArray([$Html$Attributes.id("dogs")]),
+                   A2($List.map,
+                   viewDog,
+                   model.dogs))]));
+   });
+   var update = F2(function (action,
+   model) {
+      return function () {
+         switch (action.ctor)
+         {case "NoOp": return model;
+            case "SelectTreat":
+            return _U.replace([["selectedTreat"
+                               ,$Maybe.Just(action._0)]],
+              model);}
+         _U.badCase($moduleName,
+         "between lines 33 and 38");
+      }();
+   });
+   var SelectTreat = function (a) {
+      return {ctor: "SelectTreat"
+             ,_0: a};
+   };
+   var NoOp = {ctor: "NoOp"};
+   var actionMailbox = $Signal.mailbox(NoOp);
+   var initialModel = {_: {}
+                      ,allTreats: _L.fromArray([$Treats.bacon
+                                               ,$Treats.tofu
+                                               ,$Treats.kibble])
+                      ,dogs: _L.fromArray([$Dogs.scruffy
+                                          ,$Dogs.steven
+                                          ,$Dogs.jeffrey])
+                      ,selectedTreat: $Maybe.Nothing};
+   var model = A3($Signal.foldp,
+   update,
+   initialModel,
+   actionMailbox.signal);
+   var main = A2($Signal.map,
+   view(actionMailbox.address),
+   model);
+   var Model = F3(function (a,
+   b,
+   c) {
+      return {_: {}
+             ,allTreats: c
+             ,dogs: a
+             ,selectedTreat: b};
+   });
+   _elm.Doggin.values = {_op: _op
+                        ,Model: Model
+                        ,initialModel: initialModel
+                        ,NoOp: NoOp
+                        ,SelectTreat: SelectTreat
+                        ,update: update
+                        ,view: view
+                        ,viewTreat: viewTreat
+                        ,viewDog: viewDog
+                        ,main: main
+                        ,model: model
+                        ,actionMailbox: actionMailbox};
+   return _elm.Doggin.values;
+};

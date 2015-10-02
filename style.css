@@ -1,0 +1,146 @@
+body, html {
+  margin: 0;
+  padding: 0;
+  font-family: 'open sans';
+}
+
+#page {
+  width: 960px;
+  margin: 0 auto;
+}
+
+
+h1 {
+  font-size: 36px;
+  background-color: #F3843E;
+  border-radius: 5px;
+  padding: 20px 30px;
+  width: 600px;
+  text-align: center;
+  margin: 30px auto;
+  color: rgb(5, 5, 5);
+}
+
+p {
+	text-align: center;
+}
+
+#treats, #dogs {
+	margin: 0 auto;
+}
+
+.dog {
+  width: 200px;
+  display: inline-block;
+  margin: 20px;
+  padding: 20px;
+  border-radius: 40px;
+  cursor: pointer;
+  border: 5px solid #aaa;
+  text-align: center;
+}
+
+.dog:hover {
+  opacity: 0.6;
+}
+
+.dog img {
+  width: 200px;
+}
+
+.dog-name, .dog-health, .dog-damage {
+  font-size: 28px;
+}
+
+.dog-name {
+  text-align: center;
+  color: #333;
+  width: 200px;
+}
+
+.dog-health {
+  color: #FF9900;
+  float: left;
+}
+
+.dog-damage {
+  color: #FF9900;
+  float: right;
+}
+
+#treats {
+  width: 700px;
+  margin: 0 auto;
+}
+
+.treat {
+  width: 150px;
+  height: 150px;
+  display: inline-block;
+  padding: 15px;
+  margin: 15px;
+  cursor: pointer;
+  border: 5px solid transparent;
+  border-radius: 100%;
+  text-align: center;
+}
+
+.treat:hover {
+  opacity: 0.6;
+}
+
+.treat.selected {
+  border-color: #FF9900;
+}
+
+.treat img {
+  height: 80px;
+  display: block;
+  margin: 15px auto;
+}
+
+.treat-name {
+  display: inline-block;
+  width: 150px;
+  text-align: center;
+  font-size: 24px;
+}
+
+#stats {
+  display: block;
+  width: 660px;
+  margin: 0 auto;
+  font-size: 24px;
+  color: #333;
+}
+
+#stats:after {
+  content:"";
+  display:table;
+  clear:both;
+}
+
+#player-health {
+  float: left;
+}
+
+#player-mana {
+  float: right;
+}
+
+#status-message {
+  font-size: 24px;
+  font-family: Helvetica, Arial, sans-serif;
+  background-color: #333;
+  padding: 10px 20px;
+  margin-top: 20px;
+}
+
+
+.game-status-text {
+  font-size: 96px;
+  width: 600px;
+  margin: 0 auto;
+  text-align: center;
+  color: #6F8CA0;
+}
