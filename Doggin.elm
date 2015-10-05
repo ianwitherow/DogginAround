@@ -8,6 +8,8 @@ import String
 import Window
 import Dogs exposing (Dog)
 import Treats exposing (Treat)
+import Array
+import List
 
 type alias Model = 
    { dogs          : List Dog
@@ -32,7 +34,7 @@ initialModel =
 
 type Action
     = NoOp
-    | GiveTreatToDog Int
+    | GiveTreatToDog Dog Int
     | SelectTreat Treat
 
 displayInsufficientMoves : Model -> Treat -> Model
@@ -75,7 +77,7 @@ update action model =
       SelectTreat treat ->
          { model | selectedTreat <- Just treat }
 
-      GiveTreatToDog dogIndex ->
+      GiveTreatToDog dog dogIndex ->
          case model.selectedTreat of
             Nothing ->
                { model | statusMessage <- "Select a treat first!" }
@@ -86,15 +88,32 @@ update action model =
                      displayInsufficientMoves model treat
 
                else
-                let updateDogByIndex = \index dog ->
-                   if index == dogIndex
-                      then resolveTreatOnDog treat dog
-                      else dog
-                   
+               let
+                   updateDogByIndex =
+                      \index dog ->
+                         if index == dogIndex
+                            then resolveTreatOnDog treat dog
+                            else dog
+
+                   dogName =
+                      \index dog ->
+                         if index == dogIndex
+                            then dog.name
+                            else ""
+
+                   exclamation =
+                      if treat.name == "Bacon"
+                         then "YEAH!"
+                         else if treat.name == "Kibble"
+                         then "Sweet!"
+                         else if treat.name == "Tofu"
+                         then "Neat!"
+                         else ""
+
                 in
                    { model | dogs <- List.indexedMap updateDogByIndex model.dogs
                      , movesUsed <- model.movesUsed + 1
-                     , statusMessage <- "YEAH! You gave some " ++ treat.name
+                     , statusMessage <- exclamation ++ " You gave some " ++ treat.name ++ " to " ++ dog.name
                    }
                
 
@@ -130,7 +149,7 @@ viewTreat actions selectedTreat treat =
 
 viewDog : Address Action -> Int -> Dog -> Html
 viewDog actions index dog =
-   div [class "dog", onClick actions (GiveTreatToDog (index))]
+   div [class "dog", onClick actions (GiveTreatToDog dog index)]
       [ img [src dog.imageUrl] []
       , div [class "dog-name"] [text dog.name]
       , div [class "dog-status"] [text ("Happiness: " ++ toString dog.happiness)]

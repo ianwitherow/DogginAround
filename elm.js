@@ -1850,18 +1850,27 @@ Elm.Doggin.make = function (_elm) {
          switch (action.ctor)
          {case "GiveTreatToDog":
             return function () {
-                 var _v3 = model.selectedTreat;
-                 switch (_v3.ctor)
+                 var _v4 = model.selectedTreat;
+                 switch (_v4.ctor)
                  {case "Just":
                     return _U.cmp(model.movesUsed,
                       model.totalMoves) > 0 ? A2(displayInsufficientMoves,
                       model,
-                      _v3._0) : function () {
+                      _v4._0) : function () {
+                         var exclamation = _U.eq(_v4._0.name,
+                         "Bacon") ? "YEAH!" : _U.eq(_v4._0.name,
+                         "Kibble") ? "Sweet!" : _U.eq(_v4._0.name,
+                         "Tofu") ? "Neat!" : "";
+                         var dogName = F2(function (index,
+                         dog) {
+                            return _U.eq(index,
+                            action._1) ? dog.name : "";
+                         });
                          var updateDogByIndex = F2(function (index,
                          dog) {
                             return _U.eq(index,
-                            action._0) ? A2(resolveTreatOnDog,
-                            _v3._0,
+                            action._1) ? A2(resolveTreatOnDog,
+                            _v4._0,
                             dog) : dog;
                          });
                          return _U.replace([["dogs"
@@ -1872,8 +1881,14 @@ Elm.Doggin.make = function (_elm) {
                                             ,model.movesUsed + 1]
                                            ,["statusMessage"
                                             ,A2($Basics._op["++"],
-                                            "YEAH! You gave some ",
-                                            _v3._0.name)]],
+                                            exclamation,
+                                            A2($Basics._op["++"],
+                                            " You gave some ",
+                                            A2($Basics._op["++"],
+                                            _v4._0.name,
+                                            A2($Basics._op["++"],
+                                            " to ",
+                                            action._0.name))))]],
                          model);
                       }();
                     case "Nothing":
@@ -1881,7 +1896,7 @@ Elm.Doggin.make = function (_elm) {
                                        ,"Select a treat first!"]],
                       model);}
                  _U.badCase($moduleName,
-                 "between lines 79 and 99");
+                 "between lines 81 and 118");
               }();
             case "NoOp": return model;
             case "SelectTreat":
@@ -1889,7 +1904,7 @@ Elm.Doggin.make = function (_elm) {
                                ,$Maybe.Just(action._0)]],
               model);}
          _U.badCase($moduleName,
-         "between lines 71 and 99");
+         "between lines 73 and 118");
       }();
    });
    var SelectTreat = function (a) {
@@ -1907,7 +1922,7 @@ Elm.Doggin.make = function (_elm) {
                  selectedTreat._0) ? "treat selected" : "treat";
                case "Nothing": return "treat";}
             _U.badCase($moduleName,
-            "between lines 116 and 124");
+            "between lines 135 and 143");
          }();
          return A2($Html.div,
          _L.fromArray([$Html$Attributes.$class(className)
@@ -1922,10 +1937,12 @@ Elm.Doggin.make = function (_elm) {
                       _L.fromArray([$Html.text(treat.name)]))]));
       }();
    });
-   var GiveTreatToDog = function (a) {
+   var GiveTreatToDog = F2(function (a,
+   b) {
       return {ctor: "GiveTreatToDog"
-             ,_0: a};
-   };
+             ,_0: a
+             ,_1: b};
+   });
    var viewDog = F3(function (actions,
    index,
    dog) {
@@ -1933,7 +1950,7 @@ Elm.Doggin.make = function (_elm) {
       _L.fromArray([$Html$Attributes.$class("dog")
                    ,A2($Html$Events.onClick,
                    actions,
-                   GiveTreatToDog(index))]),
+                   A2(GiveTreatToDog,dog,index))]),
       _L.fromArray([A2($Html.img,
                    _L.fromArray([$Html$Attributes.src(dog.imageUrl)]),
                    _L.fromArray([]))
