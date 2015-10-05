@@ -12,7 +12,7 @@ tofu : Treat
 tofu =
    { name           = "Tofu"
    , happinessValue = -5
-   , hungerValue    = 5
+   , hungerValue    = -5
    , imageUrl       = "treats/tofu.png"
    }
 
@@ -21,7 +21,7 @@ bacon : Treat
 bacon =
    { name           = "Bacon"
    , happinessValue = 5
-   , hungerValue    = 2
+   , hungerValue    = -2
    , imageUrl       = "treats/bacon.png"
    }
 
@@ -30,7 +30,7 @@ kibble : Treat
 kibble =
    { name           = "Kibble"
    , happinessValue = 2
-   , hungerValue    = 5
+   , hungerValue    = -5
    , imageUrl       = "treats/kibble.png"
    }
 

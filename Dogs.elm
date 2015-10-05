@@ -11,8 +11,8 @@ type alias Dog =
 scruffy : Dog
 scruffy =
    { name      = "Scruffy"
-   , happiness = 50
-   , hunger    = 50
+   , happiness = 0
+   , hunger    = 100
    , imageUrl  = "dogs/scruffy.png"
    }
 
@@ -20,8 +20,8 @@ scruffy =
 steven : Dog
 steven =
    { name      = "Steven"
-   , happiness = 50
-   , hunger    = 50
+   , happiness = 0
+   , hunger    = 100
    , imageUrl  = "dogs/steven.png"
    }
 
@@ -29,8 +29,8 @@ steven =
 jeffrey : Dog
 jeffrey =
    { name      = "Jeffrey"
-   , happiness = 50
-   , hunger    = 50
+   , happiness = 0
+   , hunger    = 100
    , imageUrl  = "dogs/jeffrey.png"
    }
 

@@ -1815,35 +1815,105 @@ Elm.Doggin.make = function (_elm) {
    $Dogs = Elm.Dogs.make(_elm),
    $Html = Elm.Html.make(_elm),
    $Html$Attributes = Elm.Html.Attributes.make(_elm),
+   $Html$Events = Elm.Html.Events.make(_elm),
    $List = Elm.List.make(_elm),
    $Maybe = Elm.Maybe.make(_elm),
    $Result = Elm.Result.make(_elm),
    $Signal = Elm.Signal.make(_elm),
    $Treats = Elm.Treats.make(_elm);
-   var viewDog = function (dog) {
-      return A2($Html.div,
-      _L.fromArray([$Html$Attributes.$class("dog")]),
-      _L.fromArray([A2($Html.img,
-                   _L.fromArray([$Html$Attributes.src(dog.imageUrl)]),
-                   _L.fromArray([]))
-                   ,A2($Html.span,
-                   _L.fromArray([$Html$Attributes.$class("dog-name")]),
-                   _L.fromArray([$Html.text(dog.name)]))]));
+   var resolveTreatOnDog = F2(function (treat,
+   dog) {
+      return function () {
+         var hunger1 = _U.cmp(dog.hunger + treat.hungerValue,
+         0) < 0 ? 0 : dog.hunger + treat.hungerValue;
+         var hunger = _U.cmp(hunger1,
+         100) > 0 ? 100 : hunger1;
+         var happiness1 = _U.cmp(dog.happiness + treat.happinessValue,
+         0) < 0 ? 0 : dog.happiness + treat.happinessValue;
+         var happiness = _U.cmp(happiness1,
+         100) > 0 ? 100 : happiness1;
+         return _U.replace([["hunger"
+                            ,hunger]
+                           ,["happiness",happiness]],
+         dog);
+      }();
+   });
+   var displayInsufficientMoves = F2(function (model,
+   treat) {
+      return _U.replace([["statusMessage"
+                         ,"You don\'t have enough moves left to give out more treats!"]],
+      model);
+   });
+   var update = F2(function (action,
+   model) {
+      return function () {
+         switch (action.ctor)
+         {case "GiveTreatToDog":
+            return function () {
+                 var _v3 = model.selectedTreat;
+                 switch (_v3.ctor)
+                 {case "Just":
+                    return _U.cmp(model.movesUsed,
+                      model.totalMoves) > 0 ? A2(displayInsufficientMoves,
+                      model,
+                      _v3._0) : function () {
+                         var updateDogByIndex = F2(function (index,
+                         dog) {
+                            return _U.eq(index,
+                            action._0) ? A2(resolveTreatOnDog,
+                            _v3._0,
+                            dog) : dog;
+                         });
+                         return _U.replace([["dogs"
+                                            ,A2($List.indexedMap,
+                                            updateDogByIndex,
+                                            model.dogs)]
+                                           ,["movesUsed"
+                                            ,model.movesUsed + 1]
+                                           ,["statusMessage"
+                                            ,A2($Basics._op["++"],
+                                            "YEAH! You gave some ",
+                                            _v3._0.name)]],
+                         model);
+                      }();
+                    case "Nothing":
+                    return _U.replace([["statusMessage"
+                                       ,"Select a treat first!"]],
+                      model);}
+                 _U.badCase($moduleName,
+                 "between lines 79 and 99");
+              }();
+            case "NoOp": return model;
+            case "SelectTreat":
+            return _U.replace([["selectedTreat"
+                               ,$Maybe.Just(action._0)]],
+              model);}
+         _U.badCase($moduleName,
+         "between lines 71 and 99");
+      }();
+   });
+   var SelectTreat = function (a) {
+      return {ctor: "SelectTreat"
+             ,_0: a};
    };
-   var viewTreat = F2(function (selectedTreat,
+   var viewTreat = F3(function (actions,
+   selectedTreat,
    treat) {
       return function () {
          var className = function () {
             switch (selectedTreat.ctor)
             {case "Just":
                return _U.eq(treat,
-                 selectedTreat._0) ? "treat treat-selected" : "treat";
+                 selectedTreat._0) ? "treat selected" : "treat";
                case "Nothing": return "treat";}
             _U.badCase($moduleName,
-            "between lines 55 and 64");
+            "between lines 116 and 124");
          }();
          return A2($Html.div,
-         _L.fromArray([$Html$Attributes.$class(className)]),
+         _L.fromArray([$Html$Attributes.$class(className)
+                      ,A2($Html$Events.onClick,
+                      actions,
+                      SelectTreat(treat))]),
          _L.fromArray([A2($Html.img,
                       _L.fromArray([$Html$Attributes.src(treat.imageUrl)]),
                       _L.fromArray([]))
@@ -1852,44 +1922,58 @@ Elm.Doggin.make = function (_elm) {
                       _L.fromArray([$Html.text(treat.name)]))]));
       }();
    });
+   var GiveTreatToDog = function (a) {
+      return {ctor: "GiveTreatToDog"
+             ,_0: a};
+   };
+   var viewDog = F3(function (actions,
+   index,
+   dog) {
+      return A2($Html.div,
+      _L.fromArray([$Html$Attributes.$class("dog")
+                   ,A2($Html$Events.onClick,
+                   actions,
+                   GiveTreatToDog(index))]),
+      _L.fromArray([A2($Html.img,
+                   _L.fromArray([$Html$Attributes.src(dog.imageUrl)]),
+                   _L.fromArray([]))
+                   ,A2($Html.div,
+                   _L.fromArray([$Html$Attributes.$class("dog-name")]),
+                   _L.fromArray([$Html.text(dog.name)]))
+                   ,A2($Html.div,
+                   _L.fromArray([$Html$Attributes.$class("dog-status")]),
+                   _L.fromArray([$Html.text(A2($Basics._op["++"],
+                   "Happiness: ",
+                   $Basics.toString(dog.happiness)))]))
+                   ,A2($Html.div,
+                   _L.fromArray([$Html$Attributes.$class("dog-status")]),
+                   _L.fromArray([$Html.text(A2($Basics._op["++"],
+                   "Hunger: ",
+                   $Basics.toString(dog.hunger)))]))]));
+   });
    var view = F2(function (actions,
    model) {
       return A2($Html.div,
       _L.fromArray([$Html$Attributes.id("page")]),
       _L.fromArray([A2($Html.h1,
                    _L.fromArray([]),
-                   _L.fromArray([$Html.text("Doggin\' Around")]))
+                   _L.fromArray([$Html.text("Doggin\' Around!")]))
                    ,A2($Html.p,
                    _L.fromArray([]),
-                   _L.fromArray([$Html.text("Select a treat, then choose a dog to give it to!")]))
+                   _L.fromArray([$Html.text(model.statusMessage)]))
                    ,A2($Html.div,
                    _L.fromArray([$Html$Attributes.id("treats")]),
                    A2($List.map,
-                   viewTreat(model.selectedTreat),
+                   A2(viewTreat,
+                   actions,
+                   model.selectedTreat),
                    model.allTreats))
                    ,A2($Html.div,
                    _L.fromArray([$Html$Attributes.id("dogs")]),
-                   A2($List.map,
-                   viewDog,
+                   A2($List.indexedMap,
+                   viewDog(actions),
                    model.dogs))]));
    });
-   var update = F2(function (action,
-   model) {
-      return function () {
-         switch (action.ctor)
-         {case "NoOp": return model;
-            case "SelectTreat":
-            return _U.replace([["selectedTreat"
-                               ,$Maybe.Just(action._0)]],
-              model);}
-         _U.badCase($moduleName,
-         "between lines 33 and 38");
-      }();
-   });
-   var SelectTreat = function (a) {
-      return {ctor: "SelectTreat"
-             ,_0: a};
-   };
    var NoOp = {ctor: "NoOp"};
    var actionMailbox = $Signal.mailbox(NoOp);
    var initialModel = {_: {}
@@ -1899,7 +1983,10 @@ Elm.Doggin.make = function (_elm) {
                       ,dogs: _L.fromArray([$Dogs.scruffy
                                           ,$Dogs.steven
                                           ,$Dogs.jeffrey])
-                      ,selectedTreat: $Maybe.Nothing};
+                      ,movesUsed: 0
+                      ,selectedTreat: $Maybe.Nothing
+                      ,statusMessage: "Select a treat, then choose a dog to give it to!"
+                      ,totalMoves: 100};
    var model = A3($Signal.foldp,
    update,
    initialModel,
@@ -1907,19 +1994,28 @@ Elm.Doggin.make = function (_elm) {
    var main = A2($Signal.map,
    view(actionMailbox.address),
    model);
-   var Model = F3(function (a,
+   var Model = F6(function (a,
    b,
-   c) {
+   c,
+   d,
+   e,
+   f) {
       return {_: {}
              ,allTreats: c
              ,dogs: a
-             ,selectedTreat: b};
+             ,movesUsed: e
+             ,selectedTreat: b
+             ,statusMessage: f
+             ,totalMoves: d};
    });
    _elm.Doggin.values = {_op: _op
                         ,Model: Model
                         ,initialModel: initialModel
                         ,NoOp: NoOp
+                        ,GiveTreatToDog: GiveTreatToDog
                         ,SelectTreat: SelectTreat
+                        ,displayInsufficientMoves: displayInsufficientMoves
+                        ,resolveTreatOnDog: resolveTreatOnDog
                         ,update: update
                         ,view: view
                         ,viewTreat: viewTreat
@@ -1946,18 +2042,18 @@ Elm.Dogs.make = function (_elm) {
    $Result = Elm.Result.make(_elm),
    $Signal = Elm.Signal.make(_elm);
    var jeffrey = {_: {}
-                 ,happiness: 50
-                 ,hunger: 50
+                 ,happiness: 0
+                 ,hunger: 100
                  ,imageUrl: "dogs/jeffrey.png"
                  ,name: "Jeffrey"};
    var steven = {_: {}
-                ,happiness: 50
-                ,hunger: 50
+                ,happiness: 0
+                ,hunger: 100
                 ,imageUrl: "dogs/steven.png"
                 ,name: "Steven"};
    var scruffy = {_: {}
-                 ,happiness: 50
-                 ,hunger: 50
+                 ,happiness: 0
+                 ,hunger: 100
                  ,imageUrl: "dogs/scruffy.png"
                  ,name: "Scruffy"};
    var Dog = F4(function (a,
@@ -12984,17 +13080,17 @@ Elm.Treats.make = function (_elm) {
    $Signal = Elm.Signal.make(_elm);
    var kibble = {_: {}
                 ,happinessValue: 2
-                ,hungerValue: 5
+                ,hungerValue: -5
                 ,imageUrl: "treats/kibble.png"
                 ,name: "Kibble"};
    var bacon = {_: {}
                ,happinessValue: 5
-               ,hungerValue: 2
+               ,hungerValue: -2
                ,imageUrl: "treats/bacon.png"
                ,name: "Bacon"};
    var tofu = {_: {}
               ,happinessValue: -5
-              ,hungerValue: 5
+              ,hungerValue: -5
               ,imageUrl: "treats/tofu.png"
               ,name: "Tofu"};
    var Treat = F4(function (a,

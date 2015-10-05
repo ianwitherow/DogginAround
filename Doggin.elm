@@ -13,6 +13,9 @@ type alias Model =
    { dogs          : List Dog
    , selectedTreat : Maybe Treat
    , allTreats     : List Treat
+   , totalMoves    : Int
+   , movesUsed     : Int
+   , statusMessage : String
    }
 
 
@@ -21,12 +24,47 @@ initialModel =
    { dogs          = [ Dogs.scruffy, Dogs.steven, Dogs.jeffrey ]
    , selectedTreat = Nothing
    , allTreats     = [ Treats.bacon, Treats.tofu, Treats.kibble ]
+   , totalMoves    = 100
+   , movesUsed     = 0
+   , statusMessage = "Select a treat, then choose a dog to give it to!"
    }
 
 
 type Action
     = NoOp
+    | GiveTreatToDog Int
     | SelectTreat Treat
+
+displayInsufficientMoves : Model -> Treat -> Model
+displayInsufficientMoves model treat =
+   { model | statusMessage <- "You don't have enough moves left to give out more treats!" }
+
+resolveTreatOnDog : Treat -> Dog -> Dog
+resolveTreatOnDog treat dog =
+   let
+      happiness1 =
+         if dog.happiness + treat.happinessValue < 0
+            then 0
+            else dog.happiness + treat.happinessValue
+
+      happiness =
+         if happiness1 > 100
+            then 100
+            else happiness1
+
+      hunger1 =
+         if dog.hunger + treat.hungerValue < 0
+            then 0
+            else dog.hunger + treat.hungerValue
+
+      hunger =
+         if hunger1 > 100
+            then 100
+            else hunger1
+
+   in
+      { dog | hunger <- hunger
+      , happiness <- happiness }
 
 update : Action -> Model -> Model
 update action model =
@@ -37,42 +75,66 @@ update action model =
       SelectTreat treat ->
          { model | selectedTreat <- Just treat }
 
+      GiveTreatToDog dogIndex ->
+         case model.selectedTreat of
+            Nothing ->
+               { model | statusMessage <- "Select a treat first!" }
+
+            Just treat ->
+               if model.movesUsed > model.totalMoves
+                  then
+                     displayInsufficientMoves model treat
+
+               else
+                let updateDogByIndex = \index dog ->
+                   if index == dogIndex
+                      then resolveTreatOnDog treat dog
+                      else dog
+                   
+                in
+                   { model | dogs <- List.indexedMap updateDogByIndex model.dogs
+                     , movesUsed <- model.movesUsed + 1
+                     , statusMessage <- "YEAH! You gave some " ++ treat.name
+                   }
+               
+
+
 
 view : Address Action -> Model -> Html
 view actions model =
    div [id "page"]
-      [ h1 [] [text "Doggin' Around"]
-      , p [] [text "Select a treat, then choose a dog to give it to!"]
-      , div [id "treats"] ( List.map (viewTreat model.selectedTreat) model.allTreats )
-      , div [id "dogs"] ( List.map viewDog model.dogs )
+      [ h1 [] [text "Doggin' Around!"]
+      , p [] [text model.statusMessage]
+      , div [id "treats"] ( List.map (viewTreat actions model.selectedTreat) model.allTreats )
+      , div [id "dogs"] ( List.indexedMap (viewDog actions) model.dogs )
       ]
 
 
-viewTreat : Maybe Treat -> Treat -> Html
-viewTreat selectedTreat treat =
+viewTreat : Address Action -> Maybe Treat -> Treat -> Html
+viewTreat actions selectedTreat treat =
    let
-       className =
-          case selectedTreat of
-             Nothing ->
-                "treat"
+       className = case selectedTreat of
+          Nothing ->
+             "treat"
 
-             Just actualSelectedTreat ->
-                if treat == actualSelectedTreat then
-                   "treat treat-selected"
-                else
-                   "treat"
+          Just selection ->
+             if treat == selection
+                then "treat selected"
+                else "treat"
    in
-      div [class className]
+      div [class className, onClick actions (SelectTreat treat)]
          [ img [src treat.imageUrl] []
          , span [class "treat-name"] [text treat.name]
          ]
 
 
-viewDog : Dog -> Html
-viewDog dog =
-   div [class "dog"]
+viewDog : Address Action -> Int -> Dog -> Html
+viewDog actions index dog =
+   div [class "dog", onClick actions (GiveTreatToDog (index))]
       [ img [src dog.imageUrl] []
-      , span [class "dog-name"] [text dog.name]
+      , div [class "dog-name"] [text dog.name]
+      , div [class "dog-status"] [text ("Happiness: " ++ toString dog.happiness)]
+      , div [class "dog-status"] [text ("Hunger: " ++ toString dog.hunger)]
       ]
 
 
